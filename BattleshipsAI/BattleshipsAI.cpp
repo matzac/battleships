@@ -10,12 +10,27 @@ using namespace std;
 int x = 0;
 int y = 0;
 
+void duzyK(bool rozmiar){
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO info;          
+	int size;
+	if (rozmiar){
+		size == 100;
+	}
+	else {
+		size = 0;
+	}
+	info.dwSize = size;                         
+	SetConsoleCursorInfo(consoleHandle, &info); 
+}
+
+
 void gotoxy(int x, int y)
 {
 	COORD coord;              
 	coord.X = x;
 	coord.Y = y;
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord); 
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 void sterowanie(char znak){
@@ -39,10 +54,16 @@ void sterowanie(char znak){
 		gotoxy(++x, y);
 		break;
 	}
+	case ENTER: {
+		cout << "X";
+		gotoxy(x, y);
+		break;
+	}
 	}
 }
 
 int _tmain(int argc, _TCHAR* argv[]){
+	duzyK(false);
 	do {
 		sterowanie(_getch());
 	} while (1);
