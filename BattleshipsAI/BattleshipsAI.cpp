@@ -69,13 +69,15 @@ void sterowanie(char znak){
 	}
 }
 
-void rysujPlansze(){
+void rysujPlansze(int x){
+	
 	cout << " ";
 	for (int i = 0; i < 10; i++){
 		cout << (char)(65 + i);
 	}
 	cout << endl;
 	for (int i = 0; i < 10; i++){
+		gotoxy(x-1, i+1);
 		cout << i << endl;
 	}
 }
@@ -214,21 +216,40 @@ public:
 
 		int yr;
 		int xr;
-		bool poziomo;
+		int temp;
+		bool przerwij;
 		int ship[10] = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
 		gotoxy(0, 20);
 		for (int i = 0; i < 10; i++){
 			do{
+				przerwij = false;
 				xr = (rand() % 10);
 				yr = (rand() % 10);
 				yr = yr % 10;
 				if (rand() % 2){
 					//poziomo
 					if (10 - xr >= ship[i]){
+						temp = ship[i];
 						do{
-							wynik[yr][xr] = 1;
-							xr++;
-							ship[i]--;
+							if (wynik[yr][xr + temp] == 1 || wynik[yr][xr + temp + 1] == 1 || wynik[yr + 1][xr + temp + 1] == 1 || wynik[yr + 1][xr + temp] == 1 ||
+								wynik[yr + 1][xr + temp - 1] == 1 || wynik[yr][xr + temp - 1] == 1 || wynik[yr - 1][xr + temp - 1] == 1 || wynik[yr - 1][xr + temp] == 1 ||
+								wynik[yr - 1][xr + temp + 1] == 1){
+								przerwij = true;
+								break;
+							}
+							else {
+								temp--;
+							}
+						} while (temp != 0);
+						do{
+							if (przerwij){
+								break;
+							}
+							else {
+								wynik[yr][xr] = 1;
+								xr++;
+								ship[i]--;
+							}
 						} while (ship[i] != 0);
 					}
 
@@ -240,10 +261,27 @@ public:
 				else {
 					//pionowo
 					if (10 - yr >= ship[i]){
+						temp = ship[i];
 						do{
-							wynik[yr][xr] = 1;
-							yr++;
-							ship[i]--;
+							if (wynik[yr + temp][xr] == 1 || wynik[yr + temp][xr + 1] == 1 || wynik[yr + temp + 1][xr + 1] == 1 || wynik[yr + temp + 1][xr] == 1 ||
+								wynik[yr + temp + 1][xr - 1] == 1 || wynik[yr + temp][xr - 1] == 1 || wynik[yr + temp - 1][xr - 1] == 1 || wynik[yr + temp - 1][xr] == 1 ||
+								wynik[yr + temp - 1][xr + 1] == 1){
+								przerwij = true;
+								break;
+							}
+							else {
+								temp--;
+							}
+						} while (temp != 0);
+						do{
+							if (przerwij){
+								break;
+							}
+							else{
+								wynik[yr][xr] = 1;
+								yr++;
+								ship[i]--;
+							}
 						} while (ship[i] != 0);
 					}
 					else {
@@ -286,9 +324,8 @@ public:
 
 
 	void show(int y){
-		cout << "WCHODZE";
-		gotoxy(0, 0);
-		rysujPlansze();
+		gotoxy(y-1, 0);
+		rysujPlansze(y);
 		for (int i = 0; i < 10; i++){
 			
 			gotoxy(y, i+1);
@@ -309,9 +346,9 @@ int Statek::count = 0;
 
 int _tmain(int argc, _TCHAR* argv[]){
 	srand(time(NULL));
-/*	int m1 = 4;
-	int m2 = 3;
-	int m3 = 2;
+	int m1 = 0;
+	int m2 = 0;
+	int m3 = 0;
 	int m4 = 1;
 	int n;
 	vector<Statek> ships;
@@ -320,7 +357,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 		gotoxy(0, 0);
 		system("cls");
 		
-		rysujPlansze();
+		rysujPlansze(1);
 		for (int i = 0; i < ships.size(); i++){
 			ships[i].wyswietl();
 		}
@@ -377,13 +414,11 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 	Plansza plansza = Plansza(ships);
 	plansza.show(1);
-	gotoxy(0, 0);
-	*/
 
 	
 
 	Plansza komp = Plansza();
-	komp.show(1);
+	komp.show(20);
 	_getch();
 	return 0;
 }
