@@ -12,9 +12,6 @@ int x=1;
 int y=1;
 const int GORA = 72, DOL = 80, LEWO = 75, PRAWO = 77, ENTER = 13, ESC = 27;
 
-
-
-
 void gotoxy(int x, int y)
 {
 	COORD coord;
@@ -22,6 +19,22 @@ void gotoxy(int x, int y)
 	coord.Y = y;
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
+
+char getxy(int x, int y)
+{
+	gotoxy(x, y);
+	char c = '\0';
+	CONSOLE_SCREEN_BUFFER_INFO con;
+	HANDLE hcon = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hcon != INVALID_HANDLE_VALUE &&GetConsoleScreenBufferInfo(hcon, &con))
+	{
+		DWORD read = 0;
+		if (!ReadConsoleOutputCharacterA(hcon, &c, 1, con.dwCursorPosition, &read) || read != 1)
+			c = '\0';
+	}
+	return c;
+}
+
 
 void sterowanie(char znak){
 	
@@ -129,10 +142,40 @@ public:
 				break;
 			}
 			case ENTER: {
-				this->p.push_back(Punkt(x, y));
-				maszty--;
-				gotoxy(x, y);
-				break;
+				if (getxy(x, y) == 'X' || getxy(x + 1, y) == 'X' || getxy(x + 1, y + 1) == 'X' || getxy(x, y + 1) == 'X'|| 
+					getxy(x - 1, y + 1) == 'X' || getxy(x - 1, y) == 'X' || getxy(x - 1, y - 1) == 'X' || getxy(x, y - 1) == 'X' || getxy(x + 1, y - 1) == 'X'){
+					if (getxy(x + 1, y + 1) == 'X' || getxy(x - 1, y + 1) == 'X' || getxy(x - 1, y - 1) == 'X' || getxy(x + 1, y - 1) == 'X'){
+						gotoxy(30, 1);
+						cout << "blad";
+					}
+					else {
+						if (getxy(p.back().x, p.back().y) == getxy(x + 1, y) || getxy(p.back().x, p.back().y) == getxy(x - 1, y) ||
+							getxy(p.back().x, p.back().y) == getxy(x, y + 1) || getxy(p.back().x, p.back().y) == getxy(x, y - 1)){
+							gotoxy(x, y);
+							this->p.push_back(Punkt(x, y));
+							maszty--;
+							gotoxy(x, y);
+							break;
+						}
+						else {
+							gotoxy(30, 1);
+							cout << "blad";
+						}
+					}
+				}
+				else{
+					if (p.size() == 0){
+						gotoxy(x, y);
+						this->p.push_back(Punkt(x, y));
+						maszty--;
+						gotoxy(x, y);
+						break;
+					}
+					else{
+						gotoxy(30, 1);
+						cout << "blad";
+					}
+				}
 			}
 			}
 		} while (maszty != 0);
@@ -260,6 +303,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 	plansza.show(1);
 	gotoxy(0, 0);
 	_getch();
+
+
 	return 0;
 }
-
