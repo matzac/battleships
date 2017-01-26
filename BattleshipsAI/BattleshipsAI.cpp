@@ -11,8 +11,10 @@
 #include <stdio.h> 
 using namespace std;
 
-int x=1;
-int y=1;
+int x = 1;
+int y = 1;
+int dx = 20;
+int dy = 1;
 const int GORA = 72, DOL = 80, LEWO = 75, PRAWO = 77, ENTER = 13, ESC = 27;
 
 
@@ -41,7 +43,7 @@ char getxy(int x, int y)
 }
 
 void sterowanie(char znak){
-	
+
 	switch (znak){
 	case GORA: {
 		if (y > 0)
@@ -70,41 +72,42 @@ void sterowanie(char znak){
 }
 
 void rysujPlansze(int x){
-	
+
 	cout << " ";
 	for (int i = 0; i < 10; i++){
 		cout << (char)(65 + i);
 	}
 	cout << endl;
 	for (int i = 0; i < 10; i++){
-		gotoxy(x-1, i+1);
+		gotoxy(x - 1, i + 1);
 		cout << i << endl;
 	}
 }
 
 void duzyK(bool rozmiar){
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO info;          
+	CONSOLE_CURSOR_INFO info;
 	int size;
 	if (rozmiar){
-		size == 100;
+		size = 100;
 	}
 	else {
 		size = 0;
 	}
-	info.dwSize = size;                         
-	SetConsoleCursorInfo(consoleHandle, &info); 
+	info.dwSize = size;
+	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
 class Punkt{
 public:
 	int x;
 	int y;
+	int wartosc;
 
 	Punkt(){
 		this->x = 0;
 		this->y = 0;
-		
+
 	}
 
 	Punkt(int x, int y){
@@ -123,7 +126,7 @@ public:
 
 	Statek(int m){
 		this->maszty = m;
-		this-> id = ++count;
+		this->id = ++count;
 		gotoxy(x, y);
 		do{
 			switch (_getch()){
@@ -148,7 +151,7 @@ public:
 				break;
 			}
 			case ENTER: {
-				if (getxy(x, y) == 'X' || getxy(x + 1, y) == 'X' || getxy(x + 1, y + 1) == 'X' || getxy(x, y + 1) == 'X'|| 
+				if (getxy(x, y) == 'X' || getxy(x + 1, y) == 'X' || getxy(x + 1, y + 1) == 'X' || getxy(x, y + 1) == 'X' ||
 					getxy(x - 1, y + 1) == 'X' || getxy(x - 1, y) == 'X' || getxy(x - 1, y - 1) == 'X' || getxy(x, y - 1) == 'X' || getxy(x + 1, y - 1) == 'X'){
 					if (getxy(x + 1, y + 1) == 'X' || getxy(x - 1, y + 1) == 'X' || getxy(x - 1, y - 1) == 'X' || getxy(x + 1, y - 1) == 'X'){
 						gotoxy(30, 1);
@@ -218,9 +221,9 @@ public:
 		int xr;
 		int temp;
 		bool przerwij;
-		int ship[10] = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
+		int ship[10] = { 5, 4, 3, 2 };
 		gotoxy(0, 20);
-		for (int i = 0; i < 10; i++){
+		for (int i = 0; i < 4; i++){
 			do{
 				przerwij = false;
 				xr = (rand() % 10);
@@ -293,13 +296,6 @@ public:
 			//_getch();
 		}
 
-		for (int i = 0; i < 10; i++){
-			for (int j = 0; j < 10; j++){
-				cout << wynik[i][j];
-			//	_getch();
-			}
-			cout << endl;
-		}
 	}
 
 	Plansza(vector<Statek> s){
@@ -316,19 +312,37 @@ public:
 				dy = s[i].p[j].y;
 				dx = s[i].p[j].x;
 				//cout << "dx = " << dx << ", dy = " << dy << endl;
-				wynik[dy-1][dx-1] = 1;
-			//	cout << "wynik[dy][dx] = " << wynik[dy][dx] << endl;
+				wynik[dy - 1][dx - 1] = 1;
+				//	cout << "wynik[dy][dx] = " << wynik[dy][dx] << endl;
 			}
 		}
 	}
 
 
+	/*void show(int y){
+	gotoxy(y-1, 0);
+	rysujPlansze(y);
+	for (int i = 0; i < 10; i++){
+
+	gotoxy(y, i+1);
+	for (int j = 0; j < 10; j++){
+	if (wynik[i][j] == 0){
+	cout << " ";
+	}
+	if (wynik[i][j] == 1){
+	cout << "S";
+	}
+	}
+	cout << endl;
+	}
+	}*/
+
 	void show(int y){
-		gotoxy(y-1, 0);
+		gotoxy(y - 1, 0);
 		rysujPlansze(y);
 		for (int i = 0; i < 10; i++){
-			
-			gotoxy(y, i+1);
+
+			gotoxy(y, i + 1);
 			for (int j = 0; j < 10; j++){
 				if (wynik[i][j] == 0){
 					cout << " ";
@@ -336,27 +350,55 @@ public:
 				if (wynik[i][j] == 1){
 					cout << "S";
 				}
+				if (wynik[i][j] == 2){
+					cout << "T";
+				}
+				if (wynik[i][j] == 3){
+					cout << "*";
+				}
+			}
+			cout << endl;
+		}
+	}
+
+	void showHidden(int y){
+		gotoxy(y - 1, 0);
+		rysujPlansze(y);
+		for (int i = 0; i < 10; i++){
+
+			gotoxy(y, i + 1);
+			for (int j = 0; j < 10; j++){
+				if (wynik[i][j] == 0){
+					cout << " ";
+				}
+				if (wynik[i][j] == 1){
+					cout << " ";
+				}
+				if (wynik[i][j] == 2){
+					cout << "X";
+				}
+				if (wynik[i][j] == 3){
+					cout << "*";
+				}
 			}
 			cout << endl;
 		}
 	}
 };
 
-int Statek::count = 0;
+vector<Statek> rozstawStatki(){
 
-int _tmain(int argc, _TCHAR* argv[]){
-	srand(time(NULL));
-	int m1 = 0;
 	int m2 = 0;
 	int m3 = 0;
-	int m4 = 1;
+	int m4 = 0;
+	int m5 = 0;
 	int n;
 	vector<Statek> ships;
 
 	do{
 		gotoxy(0, 0);
 		system("cls");
-		
+
 		rysujPlansze(1);
 		for (int i = 0; i < ships.size(); i++){
 			ships[i].wyswietl();
@@ -364,61 +406,145 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 		gotoxy(1, 15);
 
-		
+
 
 		cout << "Pozostale statki do rozstawienia: " << endl;
-		cout << "1-masztowe: " << m1 <<  endl;
 		cout << "2-masztowe: " << m2 << endl;
 		cout << "3-masztowe: " << m3 << endl;
 		cout << "4-masztowe: " << m4 << endl;
+		cout << "5-masztowe: " << m5 << endl;
 
 		cout << "Wybierz, ktory statek chcesz rozstawic (1-4): ";
 		cin >> n;
 
 		switch (n){
-			case 1: { 
-				if (m1){
-					m1--;
-					ships.push_back(Statek(1));
-				}
-				break;
+		case 2: {
+			if (m2){
+				m2--;
+				ships.push_back(Statek(2));
+			}
+			break;
 
-			}
-			case 2: {
-				if (m2){
-					m2--;
-					ships.push_back(Statek(2));
-				}
-				break;
-			}
-			case 3: {
-				if (m3){
-					m3--;
-					ships.push_back(Statek(3));
-				}
-				break;
-			}
-			case 4: {
-				if (m4){
-					m4--;
-					ships.push_back(Statek(4));
-				}
-				break;
-			}
 		}
-	} while ((m1 != 0) || (m2 != 0) || (m3 != 0) || (m4 != 0));
+		case 3: {
+			if (m3){
+				m3--;
+				ships.push_back(Statek(3));
+			}
+			break;
+		}
+		case 4: {
+			if (m4){
+				m4--;
+				ships.push_back(Statek(4));
+			}
+			break;
+		}
+		case 5: {
+			if (m5){
+				m5--;
+				ships.push_back(Statek(5));
+			}
+			break;
+		}
+		}
+	} while ((m2 != 0) || (m3 != 0) || (m4 != 0) || (m5 != 0));
+	return ships;
+}
+
+int Statek::count = 0;
+
+void poluj(Plansza &p){
+	bool isNotDone = true;
+	int py;
+	int px;
+	do{
+		gotoxy(dx, dy);
+		switch (_getch()){
+		case GORA: {
+			if (dy > 1)
+				gotoxy(dx, --dy);
+			break;
+		}
+		case DOL: {
+			if (dy < 10)
+				gotoxy(dx, ++dy);
+			break;
+		}
+		case LEWO: {
+			if (dx > 20)
+				gotoxy(--dx, dy);
+			break;
+		}
+		case PRAWO: {
+			if (dx < 29)
+				gotoxy(++dx, dy);
+			break;
+		}
+		case ENTER: {
+			py = dy - 1;
+			px = dx - 20;
+			do{
+				if (p.wynik[py][px] == 1){
+					gotoxy(35, 14);
+					p.wynik[py][px] = 2;
+					cout << "trafiony! " << p.wynik[py][px];
+					isNotDone = false;
+
+				}
+				if (p.wynik[py][px] == 0){
+					gotoxy(35, 14);
+					cout << "pudlo!";
+					p.wynik[py][px] = 3;
+					isNotDone = false;
+
+
+				}
+				break;
+			} while (1);
+
+			gotoxy(dx, dy);
+			break;
+		}
+		}
+	} while (isNotDone);
+}
+
+void wyswietl(Plansza p){
+	for (int y = 0; y < 10; y++){
+		for (int x = 0; y < 10; x++){
+			cout << p.wynik[x][y];
+		}
+		cout << endl;
+	}
+}
+
+int _tmain(int argc, _TCHAR* argv[]){
+	srand(time(NULL));
+
+
+	vector<Statek> ships = rozstawStatki();
 
 	system("cls");
 
 
 
 	Plansza plansza = Plansza(ships);
-	plansza.show(1);
-
-	
-
 	Plansza komp = Plansza();
-	komp.show(20);
+	duzyK(true);
+	do{
+		system("cls");
+		plansza.show(1);
+		komp.showHidden(20);
+		komp.show(32);
+		poluj(komp);
+		gotoxy(1, 15);
+		cout << "ruch komputera...";
+		_getch();
+		//	gotoxy(30, 1);
+		//	wyswietl(komp);
+	} while (1);
+
 	_getch();
 	return 0;
 }
