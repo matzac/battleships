@@ -107,6 +107,7 @@ public:
 	Punkt(){
 		this->x = 0;
 		this->y = 0;
+		this->wartosc = 0;
 
 	}
 
@@ -207,6 +208,7 @@ public:
 class Plansza{
 public:
 	int wynik[10][10];
+	int shipCounter;
 
 
 	Plansza(){
@@ -301,6 +303,7 @@ public:
 	Plansza(vector<Statek> s){
 		int dx;
 		int dy;
+		shipCounter = 0;
 		for (int i = 0; i < 10; i++){
 			for (int j = 0; j < 10; j++){
 				wynik[i][j] = 0;
@@ -311,6 +314,7 @@ public:
 			for (int j = 0; j < s[i].p.size(); j++){
 				dy = s[i].p[j].y;
 				dx = s[i].p[j].x;
+				shipCounter++;
 				//cout << "dx = " << dx << ", dy = " << dy << endl;
 				wynik[dy - 1][dx - 1] = 1;
 				//	cout << "wynik[dy][dx] = " << wynik[dy][dx] << endl;
@@ -345,16 +349,16 @@ public:
 			gotoxy(y, i + 1);
 			for (int j = 0; j < 10; j++){
 				if (wynik[i][j] == 0){
-					cout << " ";
+					cout << "0";
 				}
 				if (wynik[i][j] == 1){
-					cout << "S";
+					cout << "1";
 				}
 				if (wynik[i][j] == 2){
-					cout << "T";
+					cout << "2";
 				}
 				if (wynik[i][j] == 3){
-					cout << "*";
+					cout << "3";
 				}
 			}
 			cout << endl;
@@ -388,10 +392,10 @@ public:
 
 vector<Statek> rozstawStatki(){
 
-	int m2 = 0;
-	int m3 = 0;
-	int m4 = 0;
-	int m5 = 0;
+	int m2 = 1;
+	int m3 = 1;
+	int m4 = 1;
+	int m5 = 1;
 	int n;
 	vector<Statek> ships;
 
@@ -510,6 +514,8 @@ void poluj(Plansza &p){
 	} while (isNotDone);
 }
 
+
+
 void wyswietl(Plansza p){
 	for (int y = 0; y < 10; y++){
 		for (int x = 0; y < 10; x++){
@@ -518,6 +524,214 @@ void wyswietl(Plansza p){
 		cout << endl;
 	}
 }
+
+
+
+Punkt polujKomp(Plansza &p, bool &mode){
+	Punkt pole[100];
+	int counter = 0;
+	int boardsize = 10;
+	for (int y = 0; y < 10; y++){
+		for (int x = 0; x < 10; x++){
+			pole[counter].x = x;
+			pole[counter].y = y;
+			counter++;
+		}
+	}
+	int ships[5] = { 5, 4, 3, 2 };
+	int licz;
+	for (int s = 0; s < 4; s++){
+		for (int y = 0; y < 10; y++){
+			for (int x = 0; x < 10; x++){
+				if (ships[s] + x <= boardsize){
+					licz = 0;
+					for (int i = 0; i < ships[s]; i++){
+						if (p.wynik[y][x + i] != 2 && p.wynik[y][x + i] != 3){
+							licz++;
+						}
+					}
+					for (int i = 0; i < ships[s]; i++){
+						if (licz == ships[s]){
+							for (int n = 0; n < 100; n++){
+								if ((pole[n].x == x + i) && (pole[n].y == y)){
+									pole[n].wartosc += 1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (int y = 0; y < 10; y++){
+			for (int x = 0; x < 10; x++){
+				if (ships[s] + y <= boardsize){
+					licz = 0;
+					for (int i = 0; i < ships[s]; i++){
+						if (p.wynik[y + i][x] != 2 && p.wynik[y + i][x] != 3){
+							licz++;
+						}
+					}
+					for (int i = 0; i < ships[s]; i++){
+						if (licz == ships[s]){
+							for (int n = 0; n < 100; n++){
+								if ((pole[n].x == x) && (pole[n].y == y + i)){
+									pole[n].wartosc += 1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		/*
+		for (int y = 0; y < 10; y++){
+		for (int x = 0; x < 10; x++){
+		if (ships[s] + y <= boardsize){
+		licz = 0;
+		for (int i = 0; i < ships[s]; i++){
+		if (p.wynik[y + i][x] != 1){
+		licz++;
+		if (licz == ships[s]){
+		for (int n = 0; n < 100; n++){
+		if ((pole[n].x == x) && (pole[n].y == y + i)){
+		pole[n].wartosc += 1;
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}*/
+	}
+
+	for (int s = 0; s < 4; s++){
+		for (int y = 0; y < 10; y++){
+			for (int x = 0; x < 10; x++){
+
+			}
+		}
+	}
+
+
+	//	for (int i = 0; i < 100; i++){
+	//		 cout << "Punkt.x = " << pole[i].x << ", Punkt.y = " << pole[i].y << ", wartosc = " << pole[i].wartosc << endl;
+	//	}
+
+
+	Punkt max;
+	for (int i = 0; i < 100; i++){
+		if (pole[i].wartosc > max.wartosc){
+			max = pole[i];
+		}
+	}
+
+	if (p.wynik[max.y][max.x] == 1){
+		p.wynik[max.y][max.x] = 2;
+		mode = false;
+		p.shipCounter--;
+	}
+	if (p.wynik[max.y][max.x] == 0){
+		p.wynik[max.y][max.x] = 3;
+		mode = true;
+
+	}
+	gotoxy(1, 14);
+	cout << "WAS HIT: x = " << max.x << ", y = " << max.y << ", wartosc = " << max.wartosc;
+	return max;
+}
+
+bool MaWolnegoSasiada(Plansza p, Punkt pkt){
+	int x = pkt.x;
+	int y = pkt.y;
+
+	//pobierz gornego sasiada
+	if (p.wynik[y - 1][x] == 0 || p.wynik[y - 1][x] == 1){
+		return true;
+	}
+
+	//pobierz dolnego sasiada
+	if (p.wynik[y + 1][x] == 0 || p.wynik[y + 1][x] == 1){
+		return true;
+	}
+
+	//pobierz lewego sasiada
+	if (p.wynik[y][x - 1] == 0 || p.wynik[y][x - 1] == 1){
+		return true;
+	}
+
+	//pobierz prawego sasiada
+	if (p.wynik[y][x + 1] == 0 || p.wynik[y][x + 1] == 1){
+		return true;
+	}
+	return false;
+}
+
+Punkt pobierzWolnegoSasiada(Plansza p, Punkt pole){
+	Punkt sasiad;
+	int x = pole.x;
+	int y = pole.y;
+
+	//pobierz gornego sasiada
+	if (p.wynik[y - 1][x] == 0 || p.wynik[y - 1][x] == 1){
+		sasiad.x = x;
+		sasiad.y = y - 1;
+		return sasiad;
+	}
+
+	//pobierz dolnego sasiada
+	 if (p.wynik[y + 1][x] == 0 || p.wynik[y + 1][x] == 1){
+		sasiad.x = x;
+		sasiad.y = y + 1;
+		return sasiad;
+	}
+
+	//pobierz lewego sasiada
+	 if (p.wynik[y][x - 1] == 0 || p.wynik[y][x - 1] == 1){
+		sasiad.x = x - 1;
+		sasiad.y = y;
+		return sasiad;
+	}
+
+	//pobierz prawego sasiada
+	if (p.wynik[y][x + 1] == 0 || p.wynik[y][x + 1] == 1){
+		sasiad.x = x + 1;
+		sasiad.y = y;
+		return sasiad;
+	}
+	if (1){
+		cout << "zwracam pole x = " << pole.x << ", y = " << pole.y;
+		_getch();
+		return pole;
+	}
+}
+
+
+void polujSasiada(Plansza &p, Punkt firsthit, Punkt &lasthit, bool &mode){
+	Punkt sasiadPola = pobierzWolnegoSasiada(p, lasthit);
+	int x = sasiadPola.x;
+	int y = sasiadPola.y;
+
+	if (p.wynik[y][x] == 0){
+		p.wynik[y][x] = 3;
+		if (MaWolnegoSasiada(p, lasthit)){
+			mode = false;
+		}
+		else{
+			lasthit = firsthit;
+			if (!MaWolnegoSasiada(p, lasthit)){
+				mode = true;
+			}
+		}
+	}
+	if (p.wynik[y][x] == 1){
+		p.wynik[y][x] = 2;
+		lasthit = sasiadPola;
+		p.shipCounter--;
+	}
+}
+
 
 int _tmain(int argc, _TCHAR* argv[]){
 	srand(time(NULL));
@@ -530,21 +744,75 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 
 	Plansza plansza = Plansza(ships);
-	Plansza komp = Plansza();
-	duzyK(true);
+	//Plansza komp = Plansza();
+	/*duzyK(true);
 	do{
-		system("cls");
-		plansza.show(1);
-		komp.showHidden(20);
-		komp.show(32);
-		poluj(komp);
-		gotoxy(1, 15);
-		cout << "ruch komputera...";
-		_getch();
-		//	gotoxy(30, 1);
-		//	wyswietl(komp);
-	} while (1);
+	system("cls");
+	plansza.show(1);
+	komp.showHidden(20);
+	komp.show(32);
+	poluj(komp);
+	gotoxy(1, 15);
+	cout << "ruch komputera...";
+	_getch();
+	//	gotoxy(30, 1);
+	//	wyswietl(komp);
+	} while (1);*/
+
+	bool kompMode = true;
+
+	
+	Punkt lasthit;
+	Punkt firsthit;
+
+	
+		do {
+			system("cls");
+			if (kompMode){
+				firsthit = polujKomp(plansza, kompMode);
+				lasthit = firsthit;
+			}
+			else{
+				polujSasiada(plansza, firsthit, lasthit, kompMode);
+			}
+			plansza.showHidden(1);
+			gotoxy(1, 20);
+			cout << "pozostalo masztow" << plansza.shipCounter;
+			_getch();
+		} while (plansza.shipCounter > 0);
 
 	_getch();
 	return 0;
+
+
 }
+
+/*for (int y = 0; y < 10; y++){
+for (int x = 0; x < 10; x++){
+licz = 0;
+for (int i = 0; i < ships[s]; i++){
+if (p.wynik[y][x + i] == 0 || p.wynik[y][x + i] == 1){
+licz += 1;
+}
+}
+if (licz == ships[s]){
+for (int i = 0; i < ships[s]; i++){
+for (int n = 0; n < 100; n++){
+if ((pole[n].x == x + i) && (pole[n].y == y)){
+pole[n].wartosc += 1;
+}
+}
+}
+}
+else{
+for (int i = 0; i < ships[s]; i++){
+for (int n = 0; n < 100; n++){
+if ((pole[n].x == x + i) && (pole[n].y == y)){
+pole[n].wartosc -= 1;
+}
+}
+}
+}
+}
+}
+*/
