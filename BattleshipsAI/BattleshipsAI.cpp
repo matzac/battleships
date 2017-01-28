@@ -212,7 +212,7 @@ public:
 
 
 	Plansza(){
-
+		shipCounter = 0;
 		for (int i = 0; i < 10; i++){
 			for (int j = 0; j < 10; j++){
 				wynik[i][j] = 0;
@@ -254,6 +254,7 @@ public:
 								wynik[yr][xr] = 1;
 								xr++;
 								ship[i]--;
+								shipCounter++;
 							}
 						} while (ship[i] != 0);
 					}
@@ -286,6 +287,7 @@ public:
 								wynik[yr][xr] = 1;
 								yr++;
 								ship[i]--;
+								shipCounter++;
 							}
 						} while (ship[i] != 0);
 					}
@@ -349,16 +351,16 @@ public:
 			gotoxy(y, i + 1);
 			for (int j = 0; j < 10; j++){
 				if (wynik[i][j] == 0){
-					cout << "0";
+					cout << " ";
 				}
 				if (wynik[i][j] == 1){
-					cout << "1";
+					cout << "S";
 				}
 				if (wynik[i][j] == 2){
-					cout << "2";
+					cout << "X";
 				}
 				if (wynik[i][j] == 3){
-					cout << "3";
+					cout << "*";
 				}
 			}
 			cout << endl;
@@ -493,6 +495,7 @@ void poluj(Plansza &p){
 					gotoxy(35, 14);
 					p.wynik[py][px] = 2;
 					cout << "trafiony! " << p.wynik[py][px];
+					p.shipCounter--;
 					isNotDone = false;
 
 				}
@@ -637,8 +640,6 @@ Punkt polujKomp(Plansza &p, bool &mode){
 		mode = true;
 
 	}
-	gotoxy(1, 14);
-	cout << "WAS HIT: x = " << max.x << ", y = " << max.y << ", wartosc = " << max.wartosc;
 	return max;
 }
 
@@ -701,7 +702,7 @@ Punkt pobierzWolnegoSasiada(Plansza p, Punkt pole){
 		return sasiad;
 	}
 	if (1){
-		cout << "zwracam pole x = " << pole.x << ", y = " << pole.y;
+		cout << "blad funkcji 'pobierzwolnegosasiada";
 		_getch();
 		return pole;
 	}
@@ -744,22 +745,65 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 
 	Plansza plansza = Plansza(ships);
-	//Plansza komp = Plansza();
-	/*duzyK(true);
-	do{
-	system("cls");
-	plansza.show(1);
-	komp.showHidden(20);
-	komp.show(32);
-	poluj(komp);
-	gotoxy(1, 15);
-	cout << "ruch komputera...";
-	_getch();
-	//	gotoxy(30, 1);
-	//	wyswietl(komp);
-	} while (1);*/
-
+	Plansza komp = Plansza();
 	bool kompMode = true;
+	Punkt lasthit;
+	Punkt firsthit;
+	int counter = 0;
+	duzyK(true);
+	do{
+		counter++;
+		system("cls");
+		gotoxy(1, 15);
+		cout << "GRACZ: ";
+		gotoxy(1, 16);
+		cout << "Maszty: " << plansza.shipCounter;
+		gotoxy(20, 15);
+		cout << "KOMPUTER: ";
+		gotoxy(20, 16);
+		cout << "Maszty: " << komp.shipCounter;
+		gotoxy(35, 7);
+		cout << "Ruch numer: " << counter;
+		plansza.show(1);
+		komp.showHidden(20);
+		//komp.show(32);
+		poluj(komp);
+		if (kompMode){
+			firsthit = polujKomp(plansza, kompMode);
+			lasthit = firsthit;
+		}
+		else{
+			polujSasiada(plansza, firsthit, lasthit, kompMode);
+		}
+		
+		_getch();
+	
+	} while (komp.shipCounter > 0 && plansza.shipCounter > 0);
+
+
+
+	system("cls");
+
+	if (komp.shipCounter > 0){
+		gotoxy(30, 11);
+		cout << "Komputer wygrywa!";
+	}
+
+	if (plansza.shipCounter > 0){
+		gotoxy(30, 11);
+		cout << "Gracz wygrywa!";
+	}
+	
+	
+	_getch();
+	_getch();
+	_getch();
+
+
+
+
+
+	/*	bool kompMode = true;
 
 	
 	Punkt lasthit;
@@ -779,7 +823,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 			gotoxy(1, 20);
 			cout << "pozostalo masztow" << plansza.shipCounter;
 			_getch();
-		} while (plansza.shipCounter > 0);
+		} while (plansza.shipCounter > 0); */
 
 	_getch();
 	return 0;
